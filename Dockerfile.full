@@ -1,0 +1,7 @@
+FROM alpine as build
+
+RUN apk add iperf3
+EXPOSE 5201
+
+ENTRYPOINT ["iperf3"]
+CMD ["--server"]

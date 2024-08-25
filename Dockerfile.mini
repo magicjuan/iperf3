@@ -1,0 +1,23 @@
+FROM alpine as build
+
+RUN apk add iperf3
+EXPOSE 5201
+
+WORKDIR /app
+RUN ldd $(which iperf3) | sed -E 's/^[^\/]*//' | cut -f1 -d' ' | sort | uniq > file.list
+RUN tar -cvf libs.tar -h -T file.list
+RUN cp $(which iperf3) .
+
+# # Create release image
+FROM alpine
+# FROM scratch
+
+WORKDIR /app
+# WORKDIR /
+COPY --from=build /app/iperf3 /app
+ADD --from=build /libs.tar /app
+
+# ENV LD_LIBRARY_PATH=/
+EXPOSE 5201
+ENTRYPOINT ["sh"]
+# CMD ["--server"]
